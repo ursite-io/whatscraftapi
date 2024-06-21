@@ -1,11 +1,10 @@
 import { Boom } from '@hapi/boom'
-const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
-interface WaSocketConnection {
-    isConnected: boolean,
-    socket: any
-}
+import { WaSocketConnection } from '../ts/interfaces/messages.interface';
+import { Chat } from '@whiskeysockets/baileys/lib/Types/Chat';
+import { readJsonFile } from '../util/utils';
+const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, baileys } = require('@whiskeysockets/baileys');
 
-let socket: WaSocketConnection = {
+let socket: WaSocketConnection = { 
     isConnected: false,
     socket: null
 };
@@ -30,7 +29,8 @@ export async function connectWhatsAppSocket(): Promise<WaSocketConnection> {
             socket.isConnected = true;
             socket.socket = sock;
             console.log('opened connection');
-            sock.sendMessage('5214431300718@s.whatsapp.net', { text: "Conectao" });
+            getGroupInfo(socket);
+            //sock.sendMessage('5214431300718@s.whatsapp.net', { text: "Conectao" });
         }
     });
 
@@ -42,3 +42,10 @@ export const getWhatsAppSocket =  (): any=> {
     }
     return socket;
 };
+const getGroupInfo = async (sock:WaSocketConnection) => {
+    const { configuration } = await readJsonFile('./config.json');
+    const chats =  await sock.socket.groupFetchAllParticipating();
+    const groups = Object.values(chats).filter((chat:any) => chat?.subject); // Filtrar solo los grupos
+    const group = groups.filter((x:any) =>x.subject === configuration.group.name);
+    console.log('------------------------------------------------\n',group);
+}

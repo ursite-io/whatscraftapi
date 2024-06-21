@@ -1,0 +1,9 @@
+{
+    "configuration" : {
+        "adminsNumbers":[""], //Admins numbers
+        "group":{
+            "name": "Whatscraft" //group name
+        } 
+        
+    }
+}

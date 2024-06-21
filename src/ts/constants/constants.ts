@@ -1,0 +1,1 @@
+export const userJoined = "Usuario conectado $1 $2";
