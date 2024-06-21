@@ -10,7 +10,7 @@ const sendMessage = async (req: MessageRequest, res: Response) => {
     const conf  = await readJsonFile('./config.json');
     const userName = req.body?.userName;
     const usersConnected = req.body?.playerList;
-    const strUsers = returnedUsersConnected(usersConnected);
+    const strUsers = usersConnected ? returnedUsersConnected(usersConnected) : '';
     const strUserConnected = strUsers.length > 0 ? 'Usuarios conectados:\n'+strUsers : '';
     let data = {
         success: true,
