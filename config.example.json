@@ -1,8 +1,8 @@
 {
     "configuration" : {
-        "adminsNumbers":[""], //Admins numbers
+        "adminsNumbers":[""],
         "group":{
-            "name": "Whatscraft" //group name
+            "name": "Whatscraft"
         } 
         
     }

@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/index.js",
-    "dev": "nodemon --ignore ./auth_info/*.json src/index.ts"
+    "dev": "nodemon --ignore ./auth_info/*.json --ignore ./config.json src/index.ts"
   },
   "author": "",
   "license": "ISC",

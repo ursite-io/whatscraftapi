@@ -1,7 +1,7 @@
 import { Boom } from '@hapi/boom'
-import { WaSocketConnection } from '../ts/interfaces/messages.interface';
+import { Configuration, WaSocketConnection } from '../ts/interfaces/messages.interface';
 import { Chat } from '@whiskeysockets/baileys/lib/Types/Chat';
-import { readJsonFile } from '../util/utils';
+import { readJsonFile, validateGroupFound, writeJsonFile } from '../util/utils';
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, baileys } = require('@whiskeysockets/baileys');
 
 let socket: WaSocketConnection = { 
@@ -43,9 +43,17 @@ export const getWhatsAppSocket =  (): any=> {
     return socket;
 };
 const getGroupInfo = async (sock:WaSocketConnection) => {
-    const { configuration } = await readJsonFile('./config.json');
+    const pathJson:string = './config.json';
+    const conf  = await readJsonFile(pathJson);
     const chats =  await sock.socket.groupFetchAllParticipating();
-    const groups = Object.values(chats).filter((chat:any) => chat?.subject); // Filtrar solo los grupos
-    const group = groups.filter((x:any) =>x.subject === configuration.group.name);
-    console.log('------------------------------------------------\n',group);
+    try {
+        const groups = Object.values(chats).filter((chat:any) => chat?.subject); // Filtrar solo los grupos
+        const group:any = groups.filter((x:any) =>x.subject === conf.configuration.group.name);
+        validateGroupFound(group, conf.configuration.group.name);
+        conf.configuration.group.id = group[0].id;
+        writeJsonFile(pathJson, conf);
+    } catch (error) {
+        console.log('❌ [Error] ❌: '+error);
+    }
+    
 }

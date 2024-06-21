@@ -16,3 +16,18 @@ export async function writeJsonFile(filePath: string, data: Configuration): Prom
     const jsonData = JSON.stringify(data, null, 2);
     await fs.writeFile(filePath, jsonData, 'utf-8');
 }
+
+export const validateGroupFound = (group: any, groupName:string) => {
+    if(group.length == 0){
+        throw new Error(`No group founded with name: ${groupName}`);
+    }
+}
+
+export const returnedUsersConnected = (userList: Array<String>): string => {
+    let strList:string = '';
+    userList.map(player=>{
+        strList = strList+`* ${player}\n`
+    })
+    
+    return strList;
+}
