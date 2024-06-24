@@ -1,5 +1,4 @@
 import { promises as fs } from 'fs';
-import * as path from 'path';
 import { Configuration } from '../ts/interfaces/messages.interface';
 export const replacePlaceholders = (template:string, values: Array<any>) => {
     return template.replace(/\$(\d+)/g, (match, number) => {
@@ -25,8 +24,8 @@ export const validateGroupFound = (group: any, groupName:string) => {
 
 export const returnedUsersConnected = (userList: Array<String>): string => {
     let strList:string = '';
-    userList.map(player=>{
-        strList = strList+`* ${player}\n`
+    userList.map((player, i)=>{
+        strList = strList+`* ${player}${userList.length === i+1 ? '' : `\n`}`
     })
     
     return strList;
