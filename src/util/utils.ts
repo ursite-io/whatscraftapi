@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import { Configuration } from '../ts/interfaces/messages.interface';
+import { whatscraftLogger } from './logger';
 export const replacePlaceholders = (template:string, values: Array<any>) => {
     return template.replace(/\$(\d+)/g, (match, number) => {
         return typeof values[number - 1] !== 'undefined' ? values[number - 1] : match;
@@ -27,6 +28,6 @@ export const returnedUsersConnected = (userList: Array<String>): string => {
     userList.map((player, i)=>{
         strList = strList+`* ${player}${userList.length === i+1 ? '' : `\n`}`
     })
-    
+    whatscraftLogger.info('User List:', userList);
     return strList;
 }

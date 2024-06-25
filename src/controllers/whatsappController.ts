@@ -2,17 +2,21 @@ import { Boom } from '@hapi/boom'
 import { Configuration, WaSocketConnection } from '../ts/interfaces/messages.interface';
 import { Chat } from '@whiskeysockets/baileys/lib/Types/Chat';
 import { readJsonFile, validateGroupFound, writeJsonFile } from '../util/utils';
+import { Browsers } from '@whiskeysockets/baileys';
+import { whatscraftLogger } from '../util/logger';
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, baileys } = require('@whiskeysockets/baileys');
 
 let socket: WaSocketConnection = { 
     isConnected: false,
-    socket: null
+    socket: undefined
 };
 export async function connectWhatsAppSocket(): Promise<WaSocketConnection> {
     const { state, saveCreds } = await useMultiFileAuthState('auth_info');
     const sock = makeWASocket({
         auth: state,
         printQRInTerminal: true,
+        browser: Browsers.macOS('Desktop'),
+        syncFullHistory: false
     });
 
     sock.ev.on('creds.update', saveCreds);
@@ -21,14 +25,14 @@ export async function connectWhatsAppSocket(): Promise<WaSocketConnection> {
         const { connection, lastDisconnect } = update;
         if (connection === 'close') {
             const shouldReconnect = (lastDisconnect.error as Boom)?.output?.statusCode !== DisconnectReason.loggedOut;
-            console.log('connection closed due to ', lastDisconnect.error, ', reconnecting ', shouldReconnect);
+            whatscraftLogger.info('connection closed due to ', lastDisconnect.error, ', reconnecting ', shouldReconnect);
             if (shouldReconnect) {
                 connectWhatsAppSocket();
             }
         } else if (connection === 'open') {
             socket.isConnected = true;
             socket.socket = sock;
-            console.log('opened connection');
+            whatscraftLogger.info('opened connection');
             getGroupInfo(socket);
             //sock.sendMessage('5214431300718@s.whatsapp.net', { text: "Conectao" });
         }
@@ -45,7 +49,7 @@ export const getWhatsAppSocket =  (): any=> {
 const getGroupInfo = async (sock:WaSocketConnection) => {
     const pathJson:string = './config.json';
     const conf  = await readJsonFile(pathJson);
-    const chats =  await sock.socket.groupFetchAllParticipating();
+    const chats:any =  await sock.socket?.groupFetchAllParticipating();
     try {
         const groups = Object.values(chats).filter((chat:any) => chat?.subject); // Filtrar solo los grupos
         const group:any = groups.filter((x:any) =>x.subject === conf.configuration.group.name);
@@ -53,7 +57,7 @@ const getGroupInfo = async (sock:WaSocketConnection) => {
         conf.configuration.group.id = group[0].id;
         writeJsonFile(pathJson, conf);
     } catch (error) {
-        console.log('❌ [Error] ❌: '+error);
+        whatscraftLogger.error(error);
     }
     
 }
