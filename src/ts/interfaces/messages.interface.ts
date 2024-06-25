@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { minecraftUserName, configuration } from '../types/messages.type';
+import { minecraftUserName, configuration, events } from '../types/messages.type';
 import { WASocket } from '@whiskeysockets/baileys';
 
 export interface WaSocketConnection {
@@ -9,6 +9,10 @@ export interface WaSocketConnection {
 
 export interface Configuration {
     configuration: configuration
+}
+
+export interface EventsMessages {
+    events: events
 }
 
 export interface WhatscraftLogger {

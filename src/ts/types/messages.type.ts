@@ -8,3 +8,9 @@ export type configuration = {
     }
 
 }
+export type events = {
+    userJoined: {
+        userConnected: string,
+        playersList: string
+    }
+}

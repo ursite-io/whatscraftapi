@@ -1,0 +1,8 @@
+{
+    "events":{
+        "userJoined":{
+            "userConnected": "User joined: $1 \n$2",
+            "playerList": "Users Connected:\n"
+        }
+    }
+}

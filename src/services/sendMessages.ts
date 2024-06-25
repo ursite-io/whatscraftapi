@@ -1,18 +1,20 @@
 import express, { Express, Request, Response, Router } from "express";
 import { getWhatsAppSocket } from "../controllers/whatsappController";
 //import { MessageRequest } from "../ts/interfaces/messages.interface";
-import { readJsonFile, replacePlaceholders, returnedUsersConnected } from "../util/utils";
+import { readJsonFileConf, readJsonFileEvents, replacePlaceholders, returnedUsersConnected } from "../util/utils";
 import { userJoined } from "../ts/constants/constants";
 import { whatscraftLogger } from "../util/logger";
+import { Configuration, EventsMessages } from "../ts/interfaces/messages.interface";
 interface MessageRequest extends Request {
     userName?: string
   }
 const sendMessage = async (req: MessageRequest, res: Response) => {
-    const conf  = await readJsonFile('./config.json');
+    const conf: Configuration  = await readJsonFileConf('./config.json');
+    const eventMessages: EventsMessages = await readJsonFileEvents('./translate.json');
     const userName = req.body?.userName;
     const usersConnected = req.body?.playerList;
     const strUsers = usersConnected ? returnedUsersConnected(usersConnected) : '';
-    const strUserConnected = strUsers.length > 0 ? 'Usuarios conectados:\n'+strUsers : '';
+    const strUserConnected = strUsers.length > 0 ? eventMessages.events.userJoined.playersList+strUsers : '';
     let data = {
         success: true,
         code: 200
@@ -20,7 +22,7 @@ const sendMessage = async (req: MessageRequest, res: Response) => {
     whatscraftLogger.info('trying send message to whatsapp');
     try{
         const { socket } = getWhatsAppSocket();
-        const txtToSend = replacePlaceholders(userJoined, [userName, strUserConnected]);
+        const txtToSend = replacePlaceholders(eventMessages.events.userJoined.userConnected, [userName, strUserConnected]);
         socket.sendMessage(conf.configuration.group.id, { text: txtToSend });
         whatscraftLogger.info('Send success!');
     }catch(e){
